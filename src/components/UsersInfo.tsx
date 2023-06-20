@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import UserCards from "./UserCards";
 import Loading from "./Loading";
 const UsersInfo = ({ login, search }: { login: string[]; search: string }) => {
@@ -16,17 +16,14 @@ const UsersInfo = ({ login, search }: { login: string[]; search: string }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
   const getUsers = async () => {
-    let EndPoint = "https://api.github.com/users";
     let data = [];
     setLoading(true);
     try {
       for (let i = 0; i < login.length; i++) {
-        // const res = await fetch(EndPoint + "/" + login[j]);
-        const res = await fetch(EndPoint + "/" + login[i], {
+        const res = await fetch(`https://api.github.com/users/${login[i]}`, {
           method: "GET",
           headers: {
-            Authorization:
-              "Bearer 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",
+            Authorization: `Bearer ${process.env.REACT_APP_GITHUB_TOKEN}`,
           },
         });
         data.push(await res.json());
@@ -37,7 +34,7 @@ const UsersInfo = ({ login, search }: { login: string[]; search: string }) => {
       setLoading(true);
     }
   };
-
+  // filter function to get only user data that have the name or company match user input
   const filterGitInfo = users.filter((info) => {
     return (
       (info.name

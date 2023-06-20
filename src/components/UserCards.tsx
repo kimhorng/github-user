@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function UserCards({
   name,
   avatar,
@@ -35,10 +33,12 @@ export default function UserCards({
           />
         </div>
         <div className="text-center mt-2">
-          <h2 className="font-semibold text-xl capitalize">
+          <h2 className="font-semibold text-xl capitalize" id="username">
             {name ? name : login}
           </h2>
-          <h3 className="text-gray-500">{company ? company : "No Company"}</h3>
+          <h3 className="text-gray-500" id="company">
+            {company ? company : "No Company"}
+          </h3>
         </div>
         <div className="mt-auto">
           <ul className="py-4 mt-2 text-gray-700 flex items-center justify-around">
@@ -87,11 +87,8 @@ export default function UserCards({
               rel="noreferrer"
               className="w-full flex justify-center"
             >
-              {/* <button className="w-1/2 block mx-auto rounded-full bg-gray-900 hover:shadow-lg font-semibold text-white px-6 py-2">
-                Visit
-              </button> */}
               <button className="w-1/2 mx-auto rounded-full bg-gray-700 hover:shadow-lg font-semibold text-white px-6 py-2 relative inline-flex items-center justify-start overflow-hidden transition-all   hover:bg-tranparent group">
-                <span className="w-0 h-0  bg-green-500 absolute top-0 left-0 ease-out duration-500 transition-all group-hover:w-full group-hover:h-full -z-1"></span>
+                <span className="w-0 h-0  bg-green-600 absolute top-0 left-0 ease-out duration-500 transition-all group-hover:w-full group-hover:h-full -z-1"></span>
                 <span className="w-full text-white transition-colors duration-300 ease-in-out group-hover:text-white z-10">
                   Visit
                 </span>
