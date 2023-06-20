@@ -14,9 +14,6 @@ function User() {
     setLoading(true);
     fetch("https://api.github.com/users", {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${process.env.REACT_APP_GITHUB_TOKEN}`,
-      },
     })
       .then((response) => {
         return response.json();

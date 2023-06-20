@@ -22,9 +22,6 @@ const UsersInfo = ({ login, search }: { login: string[]; search: string }) => {
       for (let i = 0; i < login.length; i++) {
         const res = await fetch(`https://api.github.com/users/${login[i]}`, {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${process.env.REACT_APP_GITHUB_TOKEN}`,
-          },
         });
         data.push(await res.json());
       }
