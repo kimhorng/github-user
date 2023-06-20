@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
-import UserCardContainer from "./UserCardContainer";
-const UsersInfo = ({
-  pathname,
-  search,
-}: {
-  pathname: string;
-  search: string;
-}) => {
+import UserCards from "./UserCards";
+import Loading from "./Loading";
+const UsersInfo = ({ login, search }: { login: string[]; search: string }) => {
   type User = {
     name: string;
     avatar_url: string;
@@ -18,44 +13,81 @@ const UsersInfo = ({
     login: string;
     public_repos: number;
   };
-  const [user, setUser] = useState<User>();
-  let EndPoint = "https://api.github.com/users";
-  const GetUserInfo = async () => {
-    const res = await fetch(EndPoint + "/" + pathname);
-    const data = await res.json();
-    setUser(data);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setLoading] = useState<boolean>(false);
+  const getUsers = async () => {
+    let EndPoint = "https://api.github.com/users";
+    let data = [];
+    setLoading(true);
+    try {
+      for (let i = 0; i < login.length; i++) {
+        // const res = await fetch(EndPoint + "/" + login[j]);
+        const res = await fetch(EndPoint + "/" + login[i], {
+          method: "GET",
+          headers: {
+            Authorization:
+              "Bearer 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",
+          },
+        });
+        data.push(await res.json());
+      }
+      setUsers(data);
+      setLoading(false);
+    } catch (error) {
+      setLoading(true);
+    }
   };
+
+  const filterGitInfo = users.filter((info) => {
+    return (
+      (info.name
+        ? info.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
+        : info.login.toLowerCase().indexOf(search.toLowerCase()) !== -1) ||
+      (info.company
+        ? info.company.toLowerCase().indexOf(search.toLowerCase()) !== -1
+        : "")
+    );
+  });
+
   useEffect(() => {
-    GetUserInfo();
+    getUsers();
+    // eslint-disable-next-line
   }, []);
 
-  // Filter by user name
-  const filterName = user?.name
-    ? user?.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
-    : user?.login.toLowerCase().indexOf(search.toLowerCase()) !== -1;
-
-  // Filter by company name
-  const filterCompany = user?.company
-    ? user?.company.toLowerCase().indexOf(search.toLowerCase()) !== -1
-    : "";
-
   return (
-    <div className="flex flex-wrap justify-center">
-      {filterName || filterCompany
-        ? user && (
-            <UserCardContainer
-              key={user.id}
-              name={user.name}
-              avatar={user.avatar_url}
-              followers={user.followers}
-              following={user.following}
-              company={user.company}
-              login={user.login}
-              repos={user.public_repos}
-            />
-          )
-        : null}
-    </div>
+    <>
+      {!isLoading ? (
+        <div
+          className="flex flex-wrap justify-center"
+          data-testid="filterGitInfo"
+        >
+          {filterGitInfo.length >= 1 ? (
+            filterGitInfo.map((user) => (
+              <UserCards
+                key={user.id}
+                name={user.name}
+                avatar={user.avatar_url}
+                followers={user.followers}
+                following={user.following}
+                company={user.company}
+                login={user.login}
+                repos={user.public_repos}
+              />
+            ))
+          ) : (
+            <div>
+              <img
+                src="https://img.freepik.com/premium-vector/search-result-find-illustration_585024-17.jpg"
+                alt=""
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        <Loading />
+      )}
+    </>
   );
 };
+
 export default UsersInfo;

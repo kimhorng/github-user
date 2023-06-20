@@ -12,4 +12,18 @@ const reportWebVitals = (onPerfEntry?: ReportHandler) => {
   }
 };
 
+// function sendToAnalytics(metric: any) {
+//   const body = JSON.stringify(metric);
+//   const url = 'http://localhost:3000/analytics';
+
+//   // Use `navigator.sendBeacon()` if available, falling back to `fetch()`
+//   if (navigator.sendBeacon) {
+//     navigator.sendBeacon(url, body);
+//   } else {
+//     fetch(url, { body, method: 'POST', keepalive: true });
+//   }
+// }
+
+// reportWebVitals(sendToAnalytics);
+
 export default reportWebVitals;
