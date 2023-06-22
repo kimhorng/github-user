@@ -1,42 +1,15 @@
 import React, { useEffect, useState } from "react";
 import UsersInfo from "./UsersInfo";
 import Loading from "./Loading";
+import { useFetch } from "../api/useFetch";
 function User() {
-  type User = {
-    login: string;
-  };
   const [search, setSearch] = useState("");
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(false);
-
-  //   get data of github user
-  const getUsers = async () => {
-    setLoading(true);
-    fetch("https://api.github.com/users", {
-      method: "GET",
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setUsers(data);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    getUsers();
-    // eslint-disable-next-line
-  }, []);
+  const { users, isLoading } = useFetch("https://api.github.com/users");
 
   //   search function
   const onchange = (e: { target: { value: React.SetStateAction<string> } }) => {
     setSearch(e.target.value);
   };
-
-  useEffect(() => {
-    getUsers();
-  }, []);
 
   return (
     <div className=" my-12 mt-32 mx-auto ">

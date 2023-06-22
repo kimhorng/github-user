@@ -1,38 +1,10 @@
-import { useEffect, useState } from "react";
 import UserCards from "./UserCards";
 import Loading from "./Loading";
+import { useFetch } from "../api/useFetch";
 const UsersInfo = ({ login, search }: { login: string[]; search: string }) => {
-  type User = {
-    name: string;
-    avatar_url: string;
-    id: number;
-    followers: number;
-    following: number;
-    company: string;
-    url: string;
-    login: string;
-    public_repos: number;
-  };
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setLoading] = useState<boolean>(false);
-  const getUsers = async () => {
-    let data = [];
-    setLoading(true);
-    try {
-      for (let i = 0; i < login.length; i++) {
-        const res = await fetch(`https://api.github.com/users/${login[i]}`, {
-          method: "GET",
-        });
-        data.push(await res.json());
-      }
-      setUsers(data);
-      setLoading(false);
-    } catch (error) {
-      setLoading(true);
-    }
-  };
-  // filter function to get only user data that have the name or company match user input
-  const filterGitInfo = users.filter((info) => {
+  const { userInfo, loading } = useFetch("https://api.github.com/users", login);
+
+  const filterGitInfo = userInfo.filter((info) => {
     return (
       (info.name
         ? info.name.toLowerCase().indexOf(search.toLowerCase()) !== -1
@@ -43,14 +15,9 @@ const UsersInfo = ({ login, search }: { login: string[]; search: string }) => {
     );
   });
 
-  useEffect(() => {
-    getUsers();
-    // eslint-disable-next-line
-  }, []);
-
   return (
     <>
-      {!isLoading ? (
+      {!loading ? (
         <div
           className="flex flex-wrap justify-center"
           data-testid="filterGitInfo"
@@ -72,7 +39,7 @@ const UsersInfo = ({ login, search }: { login: string[]; search: string }) => {
             <div>
               <img
                 src="https://img.freepik.com/premium-vector/search-result-find-illustration_585024-17.jpg"
-                alt=""
+                alt="search not found"
               />
             </div>
           )}
