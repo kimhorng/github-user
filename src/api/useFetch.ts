@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-
+import { makeAutoObservable } from "mobx";
 type UserInfo = {
   name: string;
   avatar_url: string;
@@ -11,53 +10,57 @@ type UserInfo = {
   login: string;
   public_repos: number;
 };
+class UserStore {
+  posts = <UserInfo[]>[];
+  post = <UserInfo[]>[];
+  loading = false;
+  users = <string[]>[];
 
-export const useFetch = (url: string, login?: string[]) => {
-  const [users, setUsers] = useState<UserInfo[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [userInfo, setUserInfo] = useState<UserInfo[]>([]);
+  constructor() {
+    makeAutoObservable(this);
+  }
 
-  // getUsers function is to get all the data from github api
-  const getUsers = async () => {
-    setIsLoading(true);
+  // fetch to get user username(login) data
+  // fetch from `https://api.github.com/users`
+  async fetchPosts() {
+    this.loading = true;
     try {
-      const apiResponse = await fetch(url);
-      const json = await apiResponse.json();
-      setUsers(json);
+      const response = await fetch("https://api.github.com/users", {
+        method: "GET",
+      });
+      const data = await response.json();
+      this.posts = data;
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching posts:", error);
+    } finally {
+      this.loading = false;
     }
-    setIsLoading(false);
-  };
+    // pass username(login) data to fetchPost() function and slice to get only 25 users
+    this.fetchPost(this.posts.slice(0, 25).map((user) => user.login));
+  }
 
-  useEffect(() => {
-    getUsers();
-  }, []);
-
-  // getUserInfo function is to get the detail data of specific usesrs
-  const getUserInfo = async () => {
+  // fetch to get the detail of each user data
+  // fetch from `https://api.github.com/users/username(login)`
+  async fetchPost(login: string[]) {
+    this.loading = true;
     let data = [];
-    setLoading(true);
-    if (login) {
-      try {
-        for (let i = 0; i < login.length; i++) {
-          const res = await fetch(`${url}/${login[i]}`, {
+    try {
+      for (let i = 0; i < login.length; i++) {
+        const response = await fetch(
+          `https://api.github.com/users/${login[i]}`,
+          {
             method: "GET",
-          });
-          data.push(await res.json());
-        }
-        setUserInfo(data);
-        setIsLoading(false);
-      } catch (error) {
-        console.log();
+          }
+        );
+        data.push(await response.json());
       }
-      setLoading(false);
+      this.post = data;
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    } finally {
+      this.loading = false;
     }
-  };
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+  }
+}
 
-  return { users, userInfo, isLoading, loading };
-};
+export const userStore = new UserStore();
